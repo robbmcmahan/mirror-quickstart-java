@@ -17,8 +17,12 @@ package com.google.glassware;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.client.http.InputStreamContent;
+import com.google.api.services.mirror.Mirror;
 import com.google.api.services.mirror.model.Command;
 import com.google.api.services.mirror.model.Contact;
+import com.google.api.services.mirror.model.Location;
+import com.google.api.services.mirror.model.MenuItem;
 import com.google.api.services.mirror.model.NotificationConfig;
 import com.google.api.services.mirror.model.Subscription;
 import com.google.api.services.mirror.model.TimelineItem;
@@ -72,11 +76,37 @@ public class NewUserBootstrapper {
     }
 
     // Send welcome timeline item
-    TimelineItem timelineItem = new TimelineItem();
-    timelineItem.setText("Welcome to the Glass Java Quick Start");
-    timelineItem.setNotification(new NotificationConfig().setLevel("DEFAULT"));
-    TimelineItem insertedItem = MirrorClient.insertTimelineItem(credential, timelineItem);
-    LOG.info("Bootstrapper inserted welcome message " + insertedItem.getId() + " for user "
-        + userId);
+    
+    
+    Mirror mirrorClient = MirrorClient.getMirror(credential);
+    Location location = mirrorClient.locations().get("latest").execute();
+    
+    LOG.info("New location is " + location.getLatitude() + ", " + location.getLongitude());
+    
+    MenuItem navAction = new MenuItem().setAction("NAVIGATE");
+    MenuItem delAction = new MenuItem().setAction("DELETE");
+    String mapImage = "<img src='glass://map?w=640&h=360&marker=0;" + location.getLatitude() + "," + location.getLongitude() + "' height='100%' width='100%'/>";
+        
+    MirrorClient.insertTimelineItem(
+        credential,
+        new TimelineItem()
+            .setHtml(makeHtmlForCard(mapImage))
+            .setNotification(new NotificationConfig().setLevel("DEFAULT")).setLocation(location)
+            .setMenuItems(Lists.newArrayList(navAction,delAction)));
+    
+//    TimelineItem timelineItem = new TimelineItem();
+//    timelineItem.setText("Remembered Location");
+//    
+//    
+//    timelineItem.setNotification(new NotificationConfig().setLevel("DEFAULT"));
+//    TimelineItem insertedItem = MirrorClient.insertTimelineItem(credential, timelineItem);
+//    LOG.info("Bootstrapper inserted welcome message " + insertedItem.getId() + " for user "
+//        + userId);
   }
+  
+  private static String makeHtmlForCard(String content) {
+	    return "<article class='photo'>" + content + 
+	    		"<div class='photo-overlay'/><section><div class='text-auto-size'><p class='yellow'>Remembered Location</p></div></section></article>";
+	  }
+
 }
