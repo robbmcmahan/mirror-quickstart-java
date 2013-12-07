@@ -57,7 +57,7 @@ public class NewUserBootstrapper {
     starterProjectContact.setId(MainServlet.CONTACT_ID);
     starterProjectContact.setDisplayName(MainServlet.CONTACT_NAME);
     starterProjectContact.setImageUrls(Lists.newArrayList(WebUtil.buildUrl(req,
-        "/static/images/chipotle-tube-640x360.jpg")));
+        "/static/images/my_location_2.jpg")));
     starterProjectContact.setAcceptCommands(Lists.newArrayList(
         new Command().setType("TAKE_A_NOTE")));
     Contact insertedContact = MirrorClient.insertContact(credential, starterProjectContact);
@@ -78,21 +78,21 @@ public class NewUserBootstrapper {
     // Send welcome timeline item
     
     
-    Mirror mirrorClient = MirrorClient.getMirror(credential);
-    Location location = mirrorClient.locations().get("latest").execute();
-    
-    LOG.info("New location is " + location.getLatitude() + ", " + location.getLongitude());
-    
-    MenuItem navAction = new MenuItem().setAction("NAVIGATE");
-    MenuItem delAction = new MenuItem().setAction("DELETE");
-    String mapImage = "<img src='glass://map?w=640&h=360&marker=0;" + location.getLatitude() + "," + location.getLongitude() + "' height='100%' width='100%'/>";
-        
-    MirrorClient.insertTimelineItem(
-        credential,
-        new TimelineItem()
-            .setHtml(makeHtmlForCard(mapImage))
-            .setNotification(new NotificationConfig().setLevel("DEFAULT")).setLocation(location)
-            .setMenuItems(Lists.newArrayList(navAction,delAction)));
+//    Mirror mirrorClient = MirrorClient.getMirror(credential);
+//    Location location = mirrorClient.locations().get("latest").execute();
+//    
+//    LOG.info("New location is " + location.getLatitude() + ", " + location.getLongitude());
+//    
+//    MenuItem navAction = new MenuItem().setAction("NAVIGATE");
+//    MenuItem delAction = new MenuItem().setAction("DELETE");
+//    String mapImage = "<img src='glass://map?w=640&h=360&marker=0;" + location.getLatitude() + "," + location.getLongitude() + "' height='100%' width='100%'/>";
+//        
+//    MirrorClient.insertTimelineItem(
+//        credential,
+//        new TimelineItem()
+//            .setHtml(makeHtmlForCard(mapImage))
+//            .setNotification(new NotificationConfig().setLevel("DEFAULT")).setLocation(location)
+//            .setMenuItems(Lists.newArrayList(navAction,delAction)));
     
 //    TimelineItem timelineItem = new TimelineItem();
 //    timelineItem.setText("Remembered Location");
@@ -104,9 +104,9 @@ public class NewUserBootstrapper {
 //        + userId);
   }
   
-  private static String makeHtmlForCard(String content) {
-	    return "<article class='photo'>" + content + 
-	    		"<div class='photo-overlay'/><section><div class='text-auto-size'><p class='yellow'>Remembered Location</p></div></section></article>";
-	  }
+//  private static String makeHtmlForCard(String content) {
+//	    return "<article class='photo'>" + content + 
+//	    		"<div class='photo-overlay'/><section><div class='text-auto-size'><p class='yellow'>Remembered Location</p></div></section></article>";
+//	  }
 
 }

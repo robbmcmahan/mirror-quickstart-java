@@ -144,16 +144,35 @@ public class NotifyServlet extends HttpServlet {
 
         // Grab the spoken text from the timeline card and update the card with
         // an HTML response (deleting the text as well).
-        String noteText = timelineItem.getText();
-        String utterance = CAT_UTTERANCES[new Random().nextInt(CAT_UTTERANCES.length)];
-
-        timelineItem.setText(null);
-        timelineItem.setHtml(makeHtmlForCard("<p class='text-auto-size'>"
-            + "Oh, did you say " + noteText + "? " + utterance + "</p>"));
-        timelineItem.setMenuItems(Lists.newArrayList(
-            new MenuItem().setAction("DELETE")));
-
-        mirrorClient.timeline().update(timelineItem.getId(), timelineItem).execute();
+     
+        
+//        String noteText = timelineItem.getText();
+//        String utterance = CAT_UTTERANCES[new Random().nextInt(CAT_UTTERANCES.length)];
+//
+//        timelineItem.setText(null);
+//        timelineItem.setHtml(makeHtmlForCard("<p class='text-auto-size'>"
+//            + "Oh, did you say " + noteText + "? " + utterance + "</p>"));
+//        timelineItem.setMenuItems(Lists.newArrayList(
+//            new MenuItem().setAction("DELETE")));
+//
+//        mirrorClient.timeline().update(timelineItem.getId(), timelineItem).execute();
+        
+        
+        //Mirror mirrorClient = MirrorClient.getMirror(credential);
+        Location location = mirrorClient.locations().get("latest").execute();
+        
+        LOG.info("New location is " + location.getLatitude() + ", " + location.getLongitude());
+        
+        MenuItem navAction = new MenuItem().setAction("NAVIGATE");
+        MenuItem delAction = new MenuItem().setAction("DELETE");
+        String mapImage = "<img src='glass://map?w=640&h=360&marker=0;" + location.getLatitude() + "," + location.getLongitude() + "' height='100%' width='100%'/>";
+            
+        MirrorClient.insertTimelineItem(
+            credential,
+            new TimelineItem()
+                .setHtml(makeHtmlForCard(mapImage))
+                .setNotification(new NotificationConfig().setLevel("DEFAULT")).setLocation(location)
+                .setMenuItems(Lists.newArrayList(navAction,delAction)));
       } else {
         LOG.warning("I don't know what to do with this notification, so I'm ignoring it.");
       }
@@ -167,8 +186,13 @@ public class NotifyServlet extends HttpServlet {
    * @param content the HTML content to wrap
    * @return the wrapped HTML content
    */
+//  private static String makeHtmlForCard(String content) {
+//    return "<article class='auto-paginate'>" + content
+//        + "<footer><p>Java Quick Start</p></footer></article>";
+//  }
+  
   private static String makeHtmlForCard(String content) {
-    return "<article class='auto-paginate'>" + content
-        + "<footer><p>Java Quick Start</p></footer></article>";
-  }
+	    return "<article class='photo'>" + content + 
+	    		"<div class='photo-overlay'/><section><div class='text-auto-size'><p class='yellow'>Remembered Location</p></div></section></article>";
+	  }
 }
